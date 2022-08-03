@@ -42,10 +42,10 @@ class FlutterWebAuthPlugin(private var context: Context? = null, private var cha
       channel = null
   }
 
-  private fun getCustomTabsPackages(context: Context, url: Uri): List<ResolveInfo> {
+  private fun getCustomTabsPackages(context: Context): List<ResolveInfo> {
     val pm: PackageManager = context.packageManager
     // Get default VIEW intent handler.
-    val activityIntent = Intent(Intent.ACTION_VIEW, url)
+    val activityIntent = Intent(Intent.ACTION_VIEW, Uri.parse("http://www.example.com"))
     // Get all apps that can handle VIEW intents.
     val resolvedActivityList: List<ResolveInfo> = pm.queryIntentActivities(activityIntent, 0)
     return resolvedActivityList.filter {
@@ -63,7 +63,7 @@ class FlutterWebAuthPlugin(private var context: Context? = null, private var cha
           val url = Uri.parse(call.argument("url"))
           val callbackUrlScheme = call.argument<String>("callbackUrlScheme")!!
           val preferEphemeral = call.argument<Boolean>("preferEphemeral")!!
-          val forceOpenInBrowser = call.argument<Boolean>("forceOpenInBrowser")!!
+          val preferWeb = call.argument<Boolean>("preferWeb")!!
 
           callbacks[callbackUrlScheme] = resultCallback
 
@@ -75,8 +75,8 @@ class FlutterWebAuthPlugin(private var context: Context? = null, private var cha
               intent.intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
           }
 
-          if (forceOpenInBrowser) {
-            val customTabsPackages = getCustomTabsPackages(context!!, url)
+          if (preferWeb) {
+            val customTabsPackages = getCustomTabsPackages(context!!)
             if (customTabsPackages.isNullOrEmpty()) {
               resultCallback.success(null)
             } else {
