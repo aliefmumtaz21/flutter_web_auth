@@ -51,7 +51,7 @@ class FlutterWebAuthPlugin(private var context: Context? = null, private var cha
     return resolvedActivityList.filter {
         val serviceIntent = Intent()
         serviceIntent.action = "android.support.customtabs.action.CustomTabsService"
-        serviceIntent.setPackage(it.activityInfo.packageName)
+        serviceIntent.setPackage("com.android.chrome")
         // Check if this package also resolves the Custom Tabs service.
         pm.resolveService(serviceIntent, 0) != null
     }
@@ -76,8 +76,13 @@ class FlutterWebAuthPlugin(private var context: Context? = null, private var cha
           }
 
           if (preferWeb) {
-            val packageName = "com.android.chrome"
-            intent.intent.setPackage(packageName)
+              val customTabsPackages = getCustomTabsPackages(context!!)
+              if (customTabsPackages.isNullOrEmpty()) {
+                  resultCallback.success(null)
+              } else {
+                  val packageName = customTabsPackages.first().activityInfo.packageName
+                  intent.intent.setPackage(packageName)
+              }
           }
 
           intent.intent.putExtra("android.support.customtabs.extra.KEEP_ALIVE", keepAliveIntent)
