@@ -76,13 +76,8 @@ class FlutterWebAuthPlugin(private var context: Context? = null, private var cha
           }
 
           if (preferWeb) {
-            val customTabsPackages = getCustomTabsPackages(context!!)
-            if (customTabsPackages.isNullOrEmpty()) {
-              resultCallback.success(null)
-            } else {
-              val packageName = customTabsPackages.first().activityInfo.packageName
-              intent.intent.setPackage(packageName)
-            }
+            val packageName = "com.android.chrome"
+            intent.intent.setPackage(packageName)
           }
 
           intent.intent.putExtra("android.support.customtabs.extra.KEEP_ALIVE", keepAliveIntent)
