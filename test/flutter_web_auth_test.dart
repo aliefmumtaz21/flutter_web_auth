@@ -5,6 +5,8 @@ import 'package:flutter_web_auth/flutter_web_auth.dart';
 void main() {
   const MethodChannel channel = MethodChannel('flutter_web_auth');
 
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   setUp(() {
     channel.setMockMethodCallHandler((MethodCall methodCall) async {
       expect(methodCall.method, 'authenticate');
@@ -24,6 +26,13 @@ void main() {
     expect(
       await FlutterWebAuth.authenticate(url: 'https://example.com/login', callbackUrlScheme: 'foobar'),
       'https://example.com/success',
+    );
+  });
+
+  test('invalid scheme', () async {
+    await expectLater(
+      FlutterWebAuth.authenticate(url: 'https://example.com/login', callbackUrlScheme: 'foobar://test'),
+      throwsA(isA<ArgumentError>()),
     );
   });
 }

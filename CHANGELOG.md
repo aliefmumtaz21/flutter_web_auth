@@ -1,3 +1,22 @@
+## 0.5.0
+
+- 💥 Upgrade to Flutter version 3
+
+  Migration guide:
+
+  This release drops support for Flutter v2, and adds support for Flutter v3. Make sure to upgrade to Flutter v3 when upgrading to this version.
+
+## 0.4.3
+
+- 🐛 Revert accidental breaking change (#142)
+
+## 0.4.2
+
+- 🎉 Add `preferEphemeral` support on macOS
+- 🐛 Remove null aware operators from not null widgets (#132)
+- 🐛 Throw a proper error on invalid callback scheme
+- 🌹 Add troubleshooting documentation
+
 ## 0.4.1
 
 - 🎉 Add support for Flutter "add to app" (#106)
