@@ -1,11 +1,11 @@
 name: flutter_web_auth
 description: Flutter plugin for authenticating a user with a web service.
-version: 0.4.1
+version: 0.5.0
 homepage: https://github.com/LinusU/flutter_web_auth
 
 environment:
-  sdk: ">=2.18.4 <3.0.0"
-  flutter: ">=2.0.0"
+  sdk: ">=2.17.0-0 <3.0.0"
+  flutter: ">=3.0.0"
 
 dependencies:
   flutter:
