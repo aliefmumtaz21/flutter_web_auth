@@ -2,6 +2,8 @@ package com.linusu.flutter_web_auth
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.net.Uri
 
 import androidx.browser.customtabs.CustomTabsIntent
@@ -23,7 +25,6 @@ class FlutterWebAuthPlugin(private var context: Context? = null, private var cha
         val plugin = FlutterWebAuthPlugin()
         plugin.initInstance(registrar.messenger(), registrar.context())
     }
-
   }
 
   fun initInstance(messenger: BinaryMessenger, context: Context) {
@@ -41,12 +42,28 @@ class FlutterWebAuthPlugin(private var context: Context? = null, private var cha
       channel = null
   }
 
+  private fun getCustomTabsPackages(context: Context): List<ResolveInfo> {
+    val pm: PackageManager = context.packageManager
+    // Get default VIEW intent handler.
+    val activityIntent = Intent(Intent.ACTION_VIEW, Uri.parse("http://www.example.com"))
+    // Get all apps that can handle VIEW intents.
+    val resolvedActivityList: List<ResolveInfo> = pm.queryIntentActivities(activityIntent, 0)
+    return resolvedActivityList.filter {
+        val serviceIntent = Intent()
+        serviceIntent.action = "android.support.customtabs.action.CustomTabsService"
+        serviceIntent.setPackage("com.android.chrome")
+        // Check if this package also resolves the Custom Tabs service.
+        pm.resolveService(serviceIntent, 0) != null
+    }
+}
+
   override fun onMethodCall(call: MethodCall, resultCallback: Result) {
     when (call.method) {
         "authenticate" -> {
           val url = Uri.parse(call.argument("url"))
           val callbackUrlScheme = call.argument<String>("callbackUrlScheme")!!
           val preferEphemeral = call.argument<Boolean>("preferEphemeral")!!
+          val preferWeb = call.argument<Boolean>("preferWeb")!!
 
           callbacks[callbackUrlScheme] = resultCallback
 
@@ -57,8 +74,12 @@ class FlutterWebAuthPlugin(private var context: Context? = null, private var cha
           if (preferEphemeral) {
               intent.intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
           }
-          intent.intent.putExtra("android.support.customtabs.extra.KEEP_ALIVE", keepAliveIntent)
 
+          if (preferWeb) {
+              serviceIntent.setPackage("com.android.chrome")
+          }
+
+          intent.intent.putExtra("android.support.customtabs.extra.KEEP_ALIVE", keepAliveIntent)
           intent.launchUrl(context!!, url)
         }
         "cleanUpDanglingCalls" -> {
@@ -72,3 +93,4 @@ class FlutterWebAuthPlugin(private var context: Context? = null, private var cha
     }
   }
 }
+
